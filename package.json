@@ -1,6 +1,7 @@
 {
-  "name": "react-native-mapbox-navigation",
-  "version": "0.1.0",
+  "name": "bg-react-native-mapbox-navigation",
+  "version": "1.0.0",
+  "private": false,
   "description": "React native mapbox navigation component",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -39,13 +40,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/nilkanth-bansode/react-native-mapbox-navigation",
+  "repository": "https://github.com/nilkanth-bansode/bg-react-native-mapbox-navigation",
   "author": "Nilkanth Bansode <nilkanth@blockgemini.com> (https://github.com/nilkanth-bansode)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nilkanth-bansode/react-native-mapbox-navigation/issues"
+    "url": "https://github.com/nilkanth-bansode/bg-react-native-mapbox-navigation/issues"
   },
-  "homepage": "https://github.com/nilkanth-bansode/react-native-mapbox-navigation#readme",
+  "homepage": "https://github.com/nilkanth-bansode/bg-react-native-mapbox-navigation#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },

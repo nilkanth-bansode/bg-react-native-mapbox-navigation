@@ -1,9 +1,5 @@
-import {
-  requireNativeComponent,
-  UIManager,
-  Platform,
-  type ViewStyle,
-} from 'react-native';
+import { requireNativeComponent, UIManager, Platform } from 'react-native';
+import type { IMapboxNavigationProps } from './typings';
 
 const LINKING_ERROR =
   `The package 'react-native-mapbox-navigation' doesn't seem to be linked. Make sure: \n\n` +
@@ -11,16 +7,11 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-type MapboxNavigationProps = {
-  color: string;
-  style: ViewStyle;
-};
+const ComponentName = 'MapboxNavigation';
 
-const ComponentName = 'MapboxNavigationView';
-
-export const MapboxNavigationView =
+export const MapboxNavigation =
   UIManager.getViewManagerConfig(ComponentName) != null
-    ? requireNativeComponent<MapboxNavigationProps>(ComponentName)
+    ? requireNativeComponent<IMapboxNavigationProps>(ComponentName)
     : () => {
         throw new Error(LINKING_ERROR);
       };

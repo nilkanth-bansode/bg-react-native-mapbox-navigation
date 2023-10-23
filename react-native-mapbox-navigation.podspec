@@ -3,6 +3,32 @@ require "json"
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
+TargetsToChangeToDynamic = []
+
+$RNMBNAV = Object.new
+
+def $RNMBNAV.post_install(installer)
+  installer.pod_targets.each do |pod|
+    if TargetsToChangeToDynamic.include?(pod.name)
+      if pod.send(:build_type) != Pod::BuildType.dynamic_framework
+        pod.instance_variable_set(:@build_type,Pod::BuildType.dynamic_framework)
+        puts "* Changed #{pod.name} to `#{pod.send(:build_type)}`"
+        fail "Unable to change build_type" unless mobile_events_target.send(:build_type) == Pod::BuildType.dynamic_framework
+      end
+    end
+  end
+end
+
+def $RNMBNAV.pre_install(installer)
+  installer.aggregate_targets.each do |target|
+    target.pod_targets.select { |p| TargetsToChangeToDynamic.include?(p.name) }.each do |mobile_events_target|
+      mobile_events_target.instance_variable_set(:@build_type,Pod::BuildType.dynamic_framework)
+      puts "* Changed #{mobile_events_target.name} to #{mobile_events_target.send(:build_type)}"
+      fail "Unable to change build_type" unless mobile_events_target.send(:build_type) == Pod::BuildType.dynamic_framework
+    end
+  end
+end
+
 Pod::Spec.new do |s|
   s.name         = "react-native-mapbox-navigation"
   s.version      = package["version"]
@@ -11,17 +37,14 @@ Pod::Spec.new do |s|
   s.license      = package["license"]
   s.authors      = package["author"]
 
-  s.platforms    = { :ios => "11.0" }
-  s.source       = { :git => "https://github.com/nilkanth-bansode/react-native-mapbox-navigation.git", :tag => "#{s.version}" }
+  s.platforms    = { :ios => "12.0" }
+  s.source       = { :git => "https://github.com/dhruvparmar1/react-native-mapbox-navigation.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
-  # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.
-  # See https://github.com/facebook/react-native/blob/febf6b7f33fdb4904669f99d795eba4c0f95d7bf/scripts/cocoapods/new_architecture.rb#L79.
-  if respond_to?(:install_modules_dependencies, true)
-    install_modules_dependencies(s)
-  else
   s.dependency "React-Core"
+  s.dependency "MapboxCoreNavigation", "~> 2.10.0"
+  s.dependency "MapboxNavigation", "~> 2.10.0"
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
@@ -37,6 +60,5 @@ Pod::Spec.new do |s|
     s.dependency "RCTRequired"
     s.dependency "RCTTypeSafety"
     s.dependency "ReactCommon/turbomodule/core"
-   end
-  end    
+  end
 end

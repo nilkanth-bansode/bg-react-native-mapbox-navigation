@@ -1,6 +1,11 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  package="com.mapboxnavigationexample">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
       android:name=".MainApplication"
@@ -21,5 +26,7 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+      <meta-data android:name="MAPBOX_ACCESS_TOKEN"
+        android:value="sk.eyJ1Ijoib3VybGFuZS1vZmZpY2lhbCIsImEiOiJja3pxbDBsZjMwOGZpMnBwa3ZrOHkyMTVoIn0.MfRy5kegnjXGxJIXlMVDgA" />
     </application>
 </manifest>

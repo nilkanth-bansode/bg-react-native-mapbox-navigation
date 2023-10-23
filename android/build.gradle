@@ -21,7 +21,6 @@ def isNewArchitectureEnabled() {
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-
 def appProject = rootProject.allprojects.find { it.plugins.hasPlugin('com.android.application') }
 
 if (isNewArchitectureEnabled()) {
@@ -82,6 +81,21 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+
+  kotlinOptions {
+    jvmTarget = "1.8"
+  }
+
+  buildFeatures {
+    viewBinding true
+  }
+
+    packagingOptions {
+        pickFirst 'lib/x86/libc++_shared.so'
+        pickFirst 'lib/x86_64/libc++_shared.so'
+        pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+        pickFirst 'lib/arm64-v8a/libc++_shared.so'
+    }
 }
 
 repositories {
@@ -89,13 +103,26 @@ repositories {
   google()
 }
 
-def kotlin_version = getExtOrDefault("kotlinVersion")
-
 dependencies {
   // For < 0.71, this will be from the local maven repo
   // For > 0.71, this will be replaced by `com.facebook.react:react-android:$version` by react gradle plugin
   //noinspection GradleDynamicVersion
-  implementation "com.facebook.react:react-native:+"
-  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "com.facebook.react:react-native:0.69.2"
+
+  // Mapbox Navigation SDK
+  implementation "com.mapbox.navigation:android:2.17.1"
+  implementation "com.mapbox.navigation:ui-dropin:2.17.1"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
+  implementation "androidx.core:core-ktx:1.9.0"
+  implementation "com.google.android.material:material:1.7.0"
+  implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.5.1'
+  implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+  implementation "androidx.appcompat:appcompat:1.5.1"
+  implementation "androidx.cardview:cardview:1.0.0"
+  implementation "com.google.android.gms:play-services-location:20.0.0"
+  implementation "com.squareup.leakcanary:leakcanary-android:2.9.1"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+
 }
 

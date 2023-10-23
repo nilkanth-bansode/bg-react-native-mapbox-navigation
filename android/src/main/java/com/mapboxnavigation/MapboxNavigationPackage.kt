@@ -12,6 +12,6 @@ class MapboxNavigationPackage : ReactPackage {
   }
 
   override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {
-    return listOf(MapboxNavigationViewManager())
+    return listOf(MapboxNavigationManager(reactContext))
   }
 }
