@@ -1,5 +1,5 @@
 import { requireNativeComponent, UIManager, Platform } from 'react-native';
-import type { IMapboxNavigationProps } from './typings';
+import type { IMapboxNavigationProps } from './types';
 
 const LINKING_ERROR =
   `The package 'react-native-mapbox-navigation' doesn't seem to be linked. Make sure: \n\n` +

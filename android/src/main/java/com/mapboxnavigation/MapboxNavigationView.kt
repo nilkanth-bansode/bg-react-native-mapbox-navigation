@@ -1,5 +1,6 @@
 package com.mapboxnavigation
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.content.res.Resources
@@ -10,10 +11,13 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.uimanager.ThemedReactContext
 import com.facebook.react.uimanager.events.RCTEventEmitter
 import com.mapbox.api.directions.v5.DirectionsCriteria
@@ -47,6 +51,7 @@ import com.mapbox.navigation.core.trip.session.LocationMatcherResult
 import com.mapbox.navigation.core.trip.session.LocationObserver
 import com.mapbox.navigation.core.trip.session.RouteProgressObserver
 import com.mapbox.navigation.core.trip.session.VoiceInstructionsObserver
+import com.mapbox.navigation.dropin.internal.extensions.updateMargins
 import com.mapbox.navigation.ui.base.util.MapboxNavigationConsumer
 import com.mapbox.navigation.ui.maneuver.api.MapboxManeuverApi
 import com.mapbox.navigation.ui.maneuver.view.MapboxManeuverView
@@ -69,6 +74,7 @@ import com.mapbox.navigation.ui.tripprogress.model.EstimatedTimeToArrivalFormatt
 import com.mapbox.navigation.ui.tripprogress.model.PercentDistanceTraveledFormatter
 import com.mapbox.navigation.ui.tripprogress.model.TimeRemainingFormatter
 import com.mapbox.navigation.ui.tripprogress.model.TripProgressUpdateFormatter
+import com.mapbox.navigation.ui.tripprogress.model.TripProgressViewOptions
 import com.mapbox.navigation.ui.tripprogress.view.MapboxTripProgressView
 import com.mapbox.navigation.ui.voice.api.MapboxSpeechApi
 import com.mapbox.navigation.ui.voice.api.MapboxVoiceInstructionsPlayer
@@ -126,38 +132,12 @@ class MapboxNavigationView(
    * other elements are overlaid on top of the map (including instruction view, buttons, etc.)
    */
   private val pixelDensity = Resources.getSystem().displayMetrics.density
-  private val overviewPadding: EdgeInsets by lazy {
-    EdgeInsets(
-      140.0 * pixelDensity,
-      40.0 * pixelDensity,
-      120.0 * pixelDensity,
-      40.0 * pixelDensity
-    )
-  }
-  private val landscapeOverviewPadding: EdgeInsets by lazy {
-    EdgeInsets(
-      30.0 * pixelDensity,
-      380.0 * pixelDensity,
-      110.0 * pixelDensity,
-      20.0 * pixelDensity
-    )
-  }
-  private val followingPadding: EdgeInsets by lazy {
-    EdgeInsets(
-      180.0 * pixelDensity,
-      40.0 * pixelDensity,
-      150.0 * pixelDensity,
-      40.0 * pixelDensity
-    )
-  }
-  private val landscapeFollowingPadding: EdgeInsets by lazy {
-    EdgeInsets(
-      30.0 * pixelDensity,
-      380.0 * pixelDensity,
-      110.0 * pixelDensity,
-      40.0 * pixelDensity
-    )
-  }
+  private var padding: EdgeInsets = EdgeInsets(
+    140.0 * pixelDensity,
+    40.0 * pixelDensity,
+    120.0 * pixelDensity,
+    40.0 * pixelDensity
+  )
 
   /**
    * Generates updates for the [MapboxManeuverView] to display the upcoming maneuver instructions
@@ -278,6 +258,7 @@ class MapboxNavigationView(
 
     override fun onNewLocationMatcherResult(locationMatcherResult: LocationMatcherResult) {
       val enhancedLocation = locationMatcherResult.enhancedLocation
+
       // update location puck's position on the map
       navigationLocationProvider.changePosition(
         location = enhancedLocation,
@@ -299,7 +280,7 @@ class MapboxNavigationView(
       // it's best to immediately move the camera to the current user location
       if (!firstLocationUpdateReceived) {
         firstLocationUpdateReceived = true
-        navigationCamera.requestNavigationCameraToOverview(
+        navigationCamera.requestNavigationCameraToFollowing(
           stateTransitionOptions = NavigationCameraTransitionOptions.Builder()
             .maxDuration(0) // instant transition
             .build()
@@ -475,17 +456,10 @@ class MapboxNavigationView(
         NavigationCameraState.IDLE -> binding.recenter.visibility = View.VISIBLE
       }
     }
-    // set the padding values depending on screen orientation and visible view layout
-    if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      viewportDataSource.overviewPadding = landscapeOverviewPadding
-    } else {
-      viewportDataSource.overviewPadding = overviewPadding
-    }
-    if (this.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-      viewportDataSource.followingPadding = landscapeFollowingPadding
-    } else {
-      viewportDataSource.followingPadding = followingPadding
-    }
+
+//    viewportDataSource.overviewPadding = padding
+//    viewportDataSource.followingPadding = padding
+    this.applyProps()
 
     // make sure to use the same DistanceFormatterOptions across different features
     val distanceFormatterOptions = DistanceFormatterOptions.Builder(context).build()
@@ -547,12 +521,19 @@ class MapboxNavigationView(
     binding.maneuverView.updateSubManeuverTextAppearance(R.style.ManeuverTextAppearance)
     binding.maneuverView.updateStepDistanceTextAppearance(R.style.StepDistanceRemainingAppearance)
 
-//    binding.tripProgressView.updateOptions()
+    val optionBuild: TripProgressViewOptions.Builder = TripProgressViewOptions.Builder();
+    optionBuild.backgroundColor(R.color.stratos);
+    optionBuild.timeRemainingTextAppearance(R.style.TimeRemainingTextAppearance);
+    optionBuild.distanceRemainingTextAppearance(R.style.ManeuverTextAppearance);
+    optionBuild.estimatedArrivalTimeTextAppearance(R.style.ManeuverTextAppearance);
+
+    binding.tripProgressView.updateOptions(optionBuild.build());
 
     // initialize view interactions
     binding.stop.setOnClickListener {
       clearRouteAndStopNavigation()
     }
+
     binding.recenter.setOnClickListener {
       navigationCamera.requestNavigationCameraToFollowing()
       binding.routeOverview.showTextAndExtend(BUTTON_ANIMATION_DURATION)
@@ -702,8 +683,7 @@ class MapboxNavigationView(
     binding.routeOverview.visibility = View.VISIBLE
     binding.tripProgressCard.visibility = View.VISIBLE
 
-    // move the camera to overview when new route is available
-    navigationCamera.requestNavigationCameraToOverview()
+    navigationCamera.requestNavigationCameraToFollowing();
   }
 
   private fun clearRouteAndStopNavigation() {
@@ -723,6 +703,14 @@ class MapboxNavigationView(
     context
       .getJSModule(RCTEventEmitter::class.java)
       .receiveEvent(id, "onError", event)
+  }
+
+  private fun applyProps() {
+    if (this::viewportDataSource.isInitialized) {
+      viewportDataSource.overviewPadding = this.padding
+      viewportDataSource.followingPadding = this.padding
+      viewportDataSource.evaluate()
+    }
   }
 
   fun onDropViewInstance() {
@@ -747,6 +735,39 @@ class MapboxNavigationView(
 
   fun setMute(mute: Boolean) {
     this.isVoiceInstructionsMuted = mute
+  }
+
+  fun setMapEdge(edge: ReadableMap) {
+    if (edge != null) {
+      val top =
+        if (edge.getDouble("top") > 0) edge.getDouble("top") * pixelDensity else this.padding.top
+      val left =
+        if (edge.getDouble("left") > 0) edge.getDouble("left") * pixelDensity else this.padding.left
+      val right =
+        if (edge.getDouble("right") > 0) edge.getDouble("right") * pixelDensity; else this.padding.right
+      val bottom =
+        if (edge.getDouble("bottom") > 0) edge.getDouble("bottom") * pixelDensity else this.padding.bottom
+
+      val edge = EdgeInsets(top, left, bottom, right);
+      this.padding = edge;
+      if (this::viewportDataSource.isInitialized) {
+        viewportDataSource.overviewPadding = edge
+        viewportDataSource.followingPadding = edge;
+        viewportDataSource.evaluate()
+      }
+    }
+  }
+
+  fun setEdge(edge: ReadableMap) {
+    if (edge != null) {
+      val top =
+        if (edge.getInt("top") > 0) edge.getInt("top") * pixelDensity else binding.maneuverView.marginTop
+      val bottom =
+        if (edge.getInt("bottom") > 0) edge.getInt("bottom") * pixelDensity else binding.tripProgressCard.marginBottom
+
+      binding.tripProgressCard.updateMargins(null, null, null, bottom.toInt());
+      binding.maneuverView.updateMargins(null, top.toInt(), null, null);
+    }
   }
 
   override fun getLifecycle(): Lifecycle {

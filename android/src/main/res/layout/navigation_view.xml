@@ -21,7 +21,6 @@
     app:cardUseCompatPadding="false"
     android:layout_marginHorizontal="16dp"
     android:layout_marginBottom="16dp"
-    android:background="@drawable/card_bg_view"
     app:cardCornerRadius="8dp"
     app:cardBackgroundColor="@color/stratos"
     app:layout_constraintBottom_toBottomOf="parent"
@@ -33,7 +32,6 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="center"
-      app:timeRemainingTextAppearance="@drawable/card_bg_view"
       />
 
     <ImageView

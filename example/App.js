@@ -6,11 +6,13 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  Button,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
 import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
 export default function App() {
+  const [destination, setDestination] = useState([73.031205, 26.270589]);
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
   }, []);
@@ -30,11 +32,15 @@ export default function App() {
     }
   };
 
+  const onDestination = () => {
+    setDestination([73.0334361, 26.2856227]);
+  };
+
   return (
     <View style={styles.container}>
       <MapboxNavigation
         origin={[73.0336933, 26.2841672]}
-        destination={[73.031205, 26.270589]}
+        destination={destination}
         style={styles.box}
         shouldSimulateRoute={false}
         showsEndOfRouteFeedback={false}
@@ -42,6 +48,8 @@ export default function App() {
         onLocationChange={event => {
           console.log('onLocationChange', event.nativeEvent);
         }}
+        mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
+        edge={{top: 16, bottom: 16}}
         onRouteProgressChange={event => {
           console.log('onRouteProgressChange', event.nativeEvent);
         }}
@@ -58,6 +66,17 @@ export default function App() {
           }
         }}
       />
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          height: 56,
+          backgroundColor: 'blue',
+        }}
+        onPress={onDestination}>
+        <Text>OnClick</Text>
+      </TouchableOpacity>
     </View>
   );
 }
