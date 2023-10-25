@@ -32,9 +32,6 @@ export default function App() {
     }
   };
 
-  const onDestination = () => {
-    setDestination([73.0334361, 26.2856227]);
-  };
 
   return (
     <View style={styles.container}>
@@ -66,17 +63,6 @@ export default function App() {
           }
         }}
       />
-      <TouchableOpacity
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          width: '100%',
-          height: 56,
-          backgroundColor: 'blue',
-        }}
-        onPress={onDestination}>
-        <Text>OnClick</Text>
-      </TouchableOpacity>
     </View>
   );
 }

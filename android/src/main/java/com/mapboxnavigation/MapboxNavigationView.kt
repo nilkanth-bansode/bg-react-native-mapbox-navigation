@@ -457,10 +457,6 @@ class MapboxNavigationView(
       }
     }
 
-//    viewportDataSource.overviewPadding = padding
-//    viewportDataSource.followingPadding = padding
-    this.applyProps()
-
     // make sure to use the same DistanceFormatterOptions across different features
     val distanceFormatterOptions = DistanceFormatterOptions.Builder(context).build()
 
@@ -550,7 +546,7 @@ class MapboxNavigationView(
     // set initial sounds button state
     binding.soundButton.unmute()
 
-    startRoute()
+    this.applyProps()
   }
 
   override fun onAttachedToWindow() {
@@ -711,6 +707,7 @@ class MapboxNavigationView(
       viewportDataSource.followingPadding = this.padding
       viewportDataSource.evaluate()
     }
+    this.startRoute()
   }
 
   fun onDropViewInstance() {
@@ -723,6 +720,11 @@ class MapboxNavigationView(
 
   fun setDestination(destination: Point?) {
     this.destination = destination
+    if (MapboxNavigationApp.isSetup() && this.binding != null){
+      this.origin?.let {
+        this.startRoute();
+      }
+    }
   }
 
   fun setShouldSimulateRoute(shouldSimulateRoute: Boolean) {
