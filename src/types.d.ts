@@ -3,14 +3,15 @@ import type { ViewStyle } from 'react-native';
 /** @type {[number, number]}
  * Provide an array with longitude and latitude [$longitude, $latitude]
  */
-declare type Coordinate = [number, number];
-declare type OnLocationChangeEvent = {
+export declare type Coordinate = [number, number];
+export declare type OnLocationChangeEvent = {
   nativeEvent?: {
     latitude: number;
     longitude: number;
   };
 };
-declare type OnRouteProgressChangeEvent = {
+
+export declare type OnRouteProgressChangeEvent = {
   nativeEvent?: {
     distanceTraveled: number;
     durationRemaining: number;
@@ -18,11 +19,20 @@ declare type OnRouteProgressChangeEvent = {
     distanceRemaining: number;
   };
 };
-declare type OnErrorEvent = {
+
+export declare type OnErrorEvent = {
   nativeEvent?: {
     message?: string;
   };
 };
+
+export declare type EdgeInsets = {
+  top: number;
+  left: number;
+  right: number;
+  bottom: number;
+};
+
 export interface IMapboxNavigationProps {
   origin: Coordinate;
   destination: Coordinate;
@@ -36,5 +46,6 @@ export interface IMapboxNavigationProps {
   hideStatusView?: boolean;
   mute?: boolean;
   style?: ViewStyle;
+  padding?: EdgeInsets;
 }
 export {};

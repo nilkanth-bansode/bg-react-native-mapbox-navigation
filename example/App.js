@@ -6,13 +6,13 @@ import {
   PermissionsAndroid,
   Platform,
   Alert,
-  Button,
+  TouchableOpacity,
+  Text,
 } from 'react-native';
-import {MapboxNavigation} from 'react-native-mapbox-navigation';
+import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
 export default function App() {
-  const [origin, setOrigin] = useState([72.8797, 19.17]);
-  const [destination, setDestination] = useState([72.8612, 19.1728]);
+  const [destination, setDestination] = useState([73.031205, 26.270589]);
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
   }, []);
@@ -32,13 +32,12 @@ export default function App() {
     }
   };
 
+
   return (
     <View style={styles.container}>
       <MapboxNavigation
-        origin={[72.8797, 19.17]}
-        // origin={[19.17, 72.8797]}
-        destination={[72.8612, 19.1728]}
-        // destination={[19.1728, 72.8612]}
+        origin={[73.0336933, 26.2841672]}
+        destination={destination}
         style={styles.box}
         shouldSimulateRoute={false}
         showsEndOfRouteFeedback={false}
@@ -46,6 +45,8 @@ export default function App() {
         onLocationChange={event => {
           console.log('onLocationChange', event.nativeEvent);
         }}
+        mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
+        edge={{top: 16, bottom: 16}}
         onRouteProgressChange={event => {
           console.log('onRouteProgressChange', event.nativeEvent);
         }}
@@ -62,30 +63,6 @@ export default function App() {
           }
         }}
       />
-      <View
-        style={{
-          flexDirection: 'row',
-          height: 60,
-          width: '100%',
-          backgroundColor: 'blue',
-        }}>
-        <View style={{width: '100%', flex: 1}}>
-          <Button
-            onPress={() => {}}
-            title="Learn More"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-          />
-        </View>
-        <View style={{width: '100%', flex: 1}}>
-          <Button
-            onPress={() => {}}
-            title="Learn More"
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-          />
-        </View>
-      </View>
     </View>
   );
 }
@@ -93,11 +70,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'green',
   },
   box: {
     flex: 1,
-    // flex: 1,
-    marginVertical: 20,
   },
 });
