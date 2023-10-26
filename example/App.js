@@ -13,6 +13,7 @@ import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
 export default function App() {
   const [destination, setDestination] = useState([73.031205, 26.270589]);
+  const [visible, setVisible] = useState(true);
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
   }, []);
@@ -32,35 +33,45 @@ export default function App() {
     }
   };
 
+  const onDeatch = () => {
+    setVisible(pre => !pre);
+  };
+
   return (
     <View style={styles.container}>
-      <MapboxNavigation
-        origin={[73.0336933, 26.2841672]}
-        destination={destination}
-        style={styles.box}
-        shouldSimulateRoute={false}
-        showsEndOfRouteFeedback={false}
-        hideStatusView={false}
-        onLocationChange={event => {
-          console.log('onLocationChange', event.nativeEvent);
-        }}
-        mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
-        edge={{top: 16, bottom: 16}}
-        onRouteProgressChange={event => {
-          console.log('onRouteProgressChange', event.nativeEvent);
-        }}
-        onArrive={() => {
-          Alert.alert('You have reached your destination');
-        }}
-        onCancelNavigation={() => {
-          Alert.alert('Cancelled navigation event');
-        }}
-        onError={event => {
-          const message = event?.nativeEvent?.message;
-          if (message) {
-            Alert.alert(message);
-          }
-        }}
+      {visible && (
+        <MapboxNavigation
+          origin={[73.0336933, 26.2841672]}
+          destination={destination}
+          style={styles.box}
+          shouldSimulateRoute={false}
+          showsEndOfRouteFeedback={false}
+          hideStatusView={false}
+          onLocationChange={event => {
+            console.log('onLocationChange', event.nativeEvent);
+          }}
+          mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
+          edge={{top: 16, bottom: 16}}
+          onRouteProgressChange={event => {
+            console.log('onRouteProgressChange', event.nativeEvent);
+          }}
+          onArrive={() => {
+            Alert.alert('You have reached your destination');
+          }}
+          onCancelNavigation={() => {
+            Alert.alert('Cancelled navigation event');
+          }}
+          onError={event => {
+            const message = event?.nativeEvent?.message;
+            if (message) {
+              Alert.alert(message);
+            }
+          }}
+        />
+      )}
+      <TouchableOpacity
+        onPress={onDeatch}
+        style={{width: '100%', height: 54, backgroundColor: 'gray'}}
       />
     </View>
   );
