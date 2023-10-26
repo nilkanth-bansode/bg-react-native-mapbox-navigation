@@ -47,18 +47,27 @@
       app:tint="@android:color/darker_gray" />
   </androidx.cardview.widget.CardView>
 
-  <com.mapbox.navigation.ui.maneuver.view.MapboxManeuverView
-    android:id="@+id/maneuverView"
+  <androidx.cardview.widget.CardView
+    android:id="@+id/maneuverCardView"
     android:layout_width="0dp"
     android:layout_height="90dp"
+    app:cardElevation="8dp"
+    app:cardUseCompatPadding="false"
     android:layout_marginHorizontal="16dp"
     android:layout_marginTop="16dp"
+    app:cardCornerRadius="8dp"
     android:visibility="invisible"
+    app:cardBackgroundColor="@color/stratos"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    app:maneuverViewIconStyle="@style/maneuverIconStyle"
-    app:maneuverViewBackgroundColor="@color/stratos" />
+    app:layout_constraintStart_toStartOf="parent">
+    <com.mapbox.navigation.ui.maneuver.view.MapboxManeuverView
+      android:id="@+id/maneuverView"
+      android:layout_height="match_parent"
+      android:layout_width="match_parent"
+      app:maneuverViewIconStyle="@style/maneuverIconStyle"
+      app:maneuverViewBackgroundColor="@color/stratos" />
+  </androidx.cardview.widget.CardView>
 
   <com.mapbox.navigation.ui.voice.view.MapboxSoundButton
     android:id="@+id/soundButton"
@@ -69,7 +78,8 @@
     android:visibility="invisible"
     app:soundButtonBackground="@drawable/bg_round"
     app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/maneuverView" />
+    app:layout_constraintTop_toBottomOf="@id/maneuverCardView" />
+
 
   <com.mapbox.navigation.ui.maps.camera.view.MapboxRouteOverviewButton
     android:id="@+id/routeOverview"
@@ -92,5 +102,6 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:recenterButtonBackground="@drawable/bg_round"
     app:layout_constraintTop_toBottomOf="@id/routeOverview" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,7 +30,9 @@ import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.TimeFormat
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.formatter.DistanceFormatterOptions
@@ -315,7 +317,7 @@ class MapboxNavigationView(
         ).show()
       },
       {
-        binding.maneuverView.visibility = View.VISIBLE
+        binding.maneuverCardView.visibility = View.VISIBLE
         binding.maneuverView.renderManeuvers(maneuvers)
       }
     )
@@ -445,6 +447,8 @@ class MapboxNavigationView(
     binding.mapView.camera.addCameraAnimationsLifecycleListener(
       NavigationBasicGesturesHandler(navigationCamera)
     )
+    binding.mapView.scalebar.enabled = false;
+    binding.mapView.compass.enabled = false;
     navigationCamera.registerNavigationCameraStateChangeObserver { navigationCameraState ->
       // shows/hide the recenter button depending on the camera state
       when (navigationCameraState) {
@@ -520,8 +524,8 @@ class MapboxNavigationView(
     val optionBuild: TripProgressViewOptions.Builder = TripProgressViewOptions.Builder();
     optionBuild.backgroundColor(R.color.stratos);
     optionBuild.timeRemainingTextAppearance(R.style.TimeRemainingTextAppearance);
-    optionBuild.distanceRemainingTextAppearance(R.style.ManeuverTextAppearance);
-    optionBuild.estimatedArrivalTimeTextAppearance(R.style.ManeuverTextAppearance);
+    optionBuild.distanceRemainingTextAppearance(R.style.TimeRemainingTextAppearance);
+    optionBuild.estimatedArrivalTimeTextAppearance(R.style.TimeRemainingTextAppearance);
 
     binding.tripProgressView.updateOptions(optionBuild.build());
 
@@ -650,14 +654,14 @@ class MapboxNavigationView(
 
         override fun onFailure(reasons: List<RouterFailure>, routeOptions: RouteOptions) {
           // no impl
-          Log.d(CLASS_NAME, "onFailure reasons:" + reasons.toString());
+          Log.d(CLASS_NAME, "onFailure reasons: $reasons");
         }
 
         override fun onRoutesReady(
           routes: List<NavigationRoute>,
           routerOrigin: RouterOrigin
         ) {
-          Log.d(CLASS_NAME, "onRoutesReady routes:" + routes.toString());
+          Log.d(CLASS_NAME, "onRoutesReady routes: $routes");
           setRouteAndStartNavigation(routes)
         }
       }
@@ -688,7 +692,7 @@ class MapboxNavigationView(
 
     // hide UI elements
     binding.soundButton.visibility = View.INVISIBLE
-    binding.maneuverView.visibility = View.INVISIBLE
+    binding.maneuverCardView.visibility = View.INVISIBLE
     binding.routeOverview.visibility = View.INVISIBLE
     binding.tripProgressCard.visibility = View.INVISIBLE
   }
@@ -761,14 +765,14 @@ class MapboxNavigationView(
   }
 
   fun setEdge(edge: ReadableMap) {
-    if (edge != null) {
+    edge.let {
       val top =
-        if (edge.getInt("top") > 0) edge.getInt("top") * pixelDensity else binding.maneuverView.marginTop
+        if (edge.getInt("top") > 0) edge.getInt("top") * pixelDensity else binding.maneuverCardView.marginTop
       val bottom =
         if (edge.getInt("bottom") > 0) edge.getInt("bottom") * pixelDensity else binding.tripProgressCard.marginBottom
 
       binding.tripProgressCard.updateMargins(null, null, null, bottom.toInt());
-      binding.maneuverView.updateMargins(null, top.toInt(), null, null);
+      binding.maneuverCardView.updateMargins(null, top.toInt(), null, null);
     }
   }
 
