@@ -33,6 +33,7 @@ import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
+import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.TimeFormat
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.formatter.DistanceFormatterOptions
@@ -203,6 +204,7 @@ class MapboxNavigationView(
    * Observes when a new voice instruction should be played.
    */
   private val voiceInstructionsObserver = VoiceInstructionsObserver { voiceInstructions ->
+    Log.d(CLASS_NAME, "VoiceInstructionsObserver - ")
     speechApi.generate(voiceInstructions, speechCallback)
   }
 
@@ -215,13 +217,14 @@ class MapboxNavigationView(
       expected.fold(
         { error ->
           // play the instruction via fallback text-to-speech engine
-          voiceInstructionsPlayer.play(
-            error.fallback,
-            voiceInstructionsPlayerCallback
-          )
+//          voiceInstructionsPlayer.play(
+//            error.fallback,
+//            voiceInstructionsPlayerCallback
+//          )
         },
         { value ->
           // play the sound file from the external generator
+          Log.d(CLASS_NAME, "PlayInstruction - ");
           voiceInstructionsPlayer.play(
             value.announcement,
             voiceInstructionsPlayerCallback
@@ -577,17 +580,22 @@ class MapboxNavigationView(
     this.origin?.let { this.destination?.let { it1 -> this.findRoute(it, it1) } }
   }
 
+  @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
   override fun onDetachedFromWindow() {
     super.onDetachedFromWindow()
-    MapboxNavigationApp.detach(this);
-  }
-
-  private fun onDestroy() {
     maneuverApi.cancel()
     routeLineApi.cancel()
     routeLineView.cancel()
     speechApi.cancel()
+    voiceInstructionsPlayer.clear()
     voiceInstructionsPlayer.shutdown()
+    MapboxNavigationApp.current()?.setNavigationRoutes(listOf())
+    MapboxNavigationApp.detach(this);
+    Log.d(CLASS_NAME, "onDetachedFromWindow - ");
+  }
+
+  private fun onDestroy() {
+    Log.d(CLASS_NAME, "OnDestroy - ")
   }
 
   private fun initNavigation() {
@@ -602,6 +610,7 @@ class MapboxNavigationView(
       object : MapboxNavigationObserver {
         @SuppressLint("MissingPermission")
         override fun onAttached(mapboxNavigation: MapboxNavigation) {
+          Log.d(CLASS_NAME, "onAttached - ");
           mapboxNavigation.registerRoutesObserver(routesObserver)
           mapboxNavigation.registerArrivalObserver(arrivalObserver)
           mapboxNavigation.registerRouteProgressObserver(routeProgressObserver)
@@ -611,10 +620,13 @@ class MapboxNavigationView(
         }
 
         override fun onDetached(mapboxNavigation: MapboxNavigation) {
-          mapboxNavigation.unregisterRoutesObserver(routesObserver)
-          mapboxNavigation.unregisterRouteProgressObserver(routeProgressObserver)
-          mapboxNavigation.unregisterLocationObserver(locationObserver)
-          mapboxNavigation.unregisterVoiceInstructionsObserver(voiceInstructionsObserver)
+          Log.d(CLASS_NAME, "onDetached - ")
+          val list = MapboxNavigationApp.getObservers(MapboxNavigationObserver::class.java)
+          if (list.isNotEmpty()){
+            list.forEach {
+              MapboxNavigationApp.unregisterObserver(it)
+            }
+          }
         }
       }
     )
@@ -724,7 +736,7 @@ class MapboxNavigationView(
 
   fun setDestination(destination: Point?) {
     this.destination = destination
-    if (MapboxNavigationApp.isSetup() && this.binding != null){
+    if (MapboxNavigationApp.isSetup() && this.binding != null) {
       this.origin?.let {
         this.startRoute();
       }
