@@ -1,8 +1,6 @@
 package com.mapboxnavigation
 
-import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.content.res.Configuration
 import android.content.res.Resources
 import android.location.Location
 import android.util.Log
@@ -87,6 +85,7 @@ import com.mapbox.navigation.ui.voice.model.SpeechValue
 import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import com.mapboxnavigation.databinding.NavigationViewBinding
 import java.util.Locale
+
 
 @SuppressLint("ViewConstructor")
 class MapboxNavigationView(
@@ -217,10 +216,10 @@ class MapboxNavigationView(
       expected.fold(
         { error ->
           // play the instruction via fallback text-to-speech engine
-//          voiceInstructionsPlayer.play(
-//            error.fallback,
-//            voiceInstructionsPlayerCallback
-//          )
+          voiceInstructionsPlayer.play(
+            error.fallback,
+            voiceInstructionsPlayerCallback
+          )
         },
         { value ->
           // play the sound file from the external generator
@@ -426,7 +425,7 @@ class MapboxNavigationView(
       return
     }
 
-    // initialize location puck
+//     initialize location puck
     binding.mapView.location.apply {
       setLocationProvider(navigationLocationProvider)
       this.locationPuck = LocationPuck2D(
@@ -445,6 +444,8 @@ class MapboxNavigationView(
       binding.mapView.camera,
       viewportDataSource
     )
+
+
     // set the animations lifecycle listener to ensure the NavigationCamera stops
     // automatically following the user location when the map is interacted with
     binding.mapView.camera.addCameraAnimationsLifecycleListener(
@@ -549,7 +550,6 @@ class MapboxNavigationView(
       // mute/unmute voice instructions
       isVoiceInstructionsMuted = !isVoiceInstructionsMuted
     }
-
     // set initial sounds button state
     binding.soundButton.unmute()
 
