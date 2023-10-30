@@ -2,6 +2,7 @@ package com.mapboxnavigation
 
 import android.annotation.SuppressLint
 import android.content.res.Resources
+import android.graphics.Color
 import android.location.Location
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.lifecycle.Lifecycle
@@ -25,10 +27,19 @@ import com.mapbox.bindgen.Expected
 import com.mapbox.geojson.Point
 import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxLifecycleObserver
 import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.ViewAnnotationOptions
+import com.mapbox.maps.extension.style.expressions.dsl.generated.literal
+import com.mapbox.maps.extension.style.layers.generated.circleLayer
+import com.mapbox.maps.extension.style.sources.generated.geoJsonSource
+import com.mapbox.maps.extension.style.style
 import com.mapbox.maps.plugin.LocationPuck2D
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.compass.compass
+import com.mapbox.maps.plugin.delegates.listeners.OnMapLoadErrorListener
+import com.mapbox.maps.plugin.lifecycle.lifecycle
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.scalebar.scalebar
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
@@ -270,8 +281,10 @@ class MapboxNavigationView(
       )
 
       // update camera position to account for new location
-      viewportDataSource.onLocationChanged(enhancedLocation)
-      viewportDataSource.evaluate()
+      if(this@MapboxNavigationView :: viewportDataSource.isInitialized) {
+        viewportDataSource.onLocationChanged(enhancedLocation)
+        viewportDataSource.evaluate()
+      }
 
       val event = Arguments.createMap()
       event.putDouble("longitude", enhancedLocation.longitude)
@@ -284,11 +297,13 @@ class MapboxNavigationView(
       // it's best to immediately move the camera to the current user location
       if (!firstLocationUpdateReceived) {
         firstLocationUpdateReceived = true
-        navigationCamera.requestNavigationCameraToFollowing(
-          stateTransitionOptions = NavigationCameraTransitionOptions.Builder()
-            .maxDuration(0) // instant transition
-            .build()
-        )
+        if (this@MapboxNavigationView::navigationCamera.isInitialized) {
+          navigationCamera.requestNavigationCameraToFollowing(
+            stateTransitionOptions = NavigationCameraTransitionOptions.Builder()
+              .maxDuration(0) // instant transition
+              .build()
+          )
+        }
       }
     }
   }

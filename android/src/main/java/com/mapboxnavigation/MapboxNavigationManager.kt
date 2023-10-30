@@ -8,16 +8,26 @@ import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.common.MapBuilder
 import com.facebook.react.uimanager.SimpleViewManager
 import com.facebook.react.uimanager.ThemedReactContext
+import com.facebook.react.uimanager.ViewGroupManager
 import com.facebook.react.uimanager.annotations.ReactProp
 import com.google.android.material.internal.ViewUtils.RelativePadding
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.ConstrainMode
+import com.mapbox.maps.GlyphsRasterizationMode
+import com.mapbox.maps.GlyphsRasterizationOptions
+import com.mapbox.maps.MapInitOptions
+import com.mapbox.maps.MapOptions
+import com.mapbox.maps.ResourceOptions
 import com.mapbox.maps.ResourceOptionsManager
+import com.mapbox.maps.Style
 import com.mapbox.maps.TileStoreUsageMode
+import com.mapbox.maps.applyDefaultParams
 import javax.annotation.Nonnull
 
 class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) :
-  SimpleViewManager<MapboxNavigationView>() {
-  private var accessToken: String? = null
+  ViewGroupManager<MapboxNavigationView>() {
+  private lateinit var accessToken: String;
 
   init {
     mCallerContext.runOnUiQueueThread {
@@ -28,7 +38,9 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) :
         )
         val bundle = app.metaData
         val accessToken = bundle.getString("MAPBOX_ACCESS_TOKEN")
-        this.accessToken = accessToken
+        if (accessToken != null) {
+          this.accessToken = accessToken
+        }
         ResourceOptionsManager.getDefault(mCallerContext, accessToken).update {
           tileStoreUsageMode(TileStoreUsageMode.READ_ONLY)
         }
@@ -95,7 +107,7 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) :
   }
 
   @ReactProp(name = "edge")
-  fun setEdge(view: MapboxNavigationView, edge: ReadableMap){
+  fun setEdge(view: MapboxNavigationView, edge: ReadableMap) {
     view.setEdge(edge);
   }
 
