@@ -1,14 +1,17 @@
 import React, {useEffect} from 'react';
 
-import {StyleSheet, View, PermissionsAndroid, Platform} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import Mapbox from './mapbox';
-import Another from './another';
+import {
+  StyleSheet,
+  View,
+  PermissionsAndroid,
+  Platform,
+  Alert,
+  TouchableOpacity,
+} from 'react-native';
+import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
-const Stack = createNativeStackNavigator();
-
-export default function App() {
+export default function App(props) {
+  const destination = [73.031205, 26.270589];
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
   }, []);
@@ -28,14 +31,44 @@ export default function App() {
     }
   };
 
+  const onDeatch = () => {
+    props.navigation.navigate('another');
+  };
+
   return (
     <View style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="initial" component={Mapbox} />
-          <Stack.Screen name="another" component={Another} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <MapboxNavigation
+        origin={[73.0336933, 26.2841672]}
+        destination={destination}
+        style={styles.box}
+        shouldSimulateRoute={false}
+        showsEndOfRouteFeedback={false}
+        hideStatusView={false}
+        onLocationChange={event => {
+          console.log('onLocationChange', event.nativeEvent);
+        }}
+        mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
+        edge={{top: 16, bottom: 16}}
+        onRouteProgressChange={event => {
+          console.log('onRouteProgressChange', event.nativeEvent);
+        }}
+        onArrive={() => {
+          Alert.alert('You have reached your destination');
+        }}
+        onCancelNavigation={() => {
+          Alert.alert('Cancelled navigation event');
+        }}
+        onError={event => {
+          const message = event?.nativeEvent?.message;
+          if (message) {
+            Alert.alert(message);
+          }
+        }}
+      />
+      <TouchableOpacity
+        onPress={onDeatch}
+        style={{width: '100%', height: 54, backgroundColor: 'gray'}}
+      />
     </View>
   );
 }
