@@ -752,7 +752,7 @@ class MapboxNavigationView(
   fun setDestination(destination: Point?) {
     this.destination = destination
     if (MapboxNavigationApp.isSetup() && this.binding != null) {
-      this.origin?.let {
+      this.destination?.let {
         this.startRoute();
       }
     }

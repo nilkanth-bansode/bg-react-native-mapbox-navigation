@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
-export default function App(props) {
+export default function App() {
   const destination = [73.031205, 26.270589];
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
@@ -31,43 +31,14 @@ export default function App(props) {
     }
   };
 
-  const onDeatch = () => {
-    props.navigation.navigate('another');
-  };
+  const onDeatch = () => {};
 
   return (
     <View style={styles.container}>
       <MapboxNavigation
-        origin={[73.0336933, 26.2841672]}
-        destination={destination}
-        style={styles.box}
-        shouldSimulateRoute={false}
-        showsEndOfRouteFeedback={false}
-        hideStatusView={false}
-        onLocationChange={event => {
-          console.log('onLocationChange', event.nativeEvent);
-        }}
-        mapEdge={{top: 100, right: 0, left: 0, bottom: 300}}
-        edge={{top: 16, bottom: 16}}
-        onRouteProgressChange={event => {
-          console.log('onRouteProgressChange', event.nativeEvent);
-        }}
-        onArrive={() => {
-          Alert.alert('You have reached your destination');
-        }}
-        onCancelNavigation={() => {
-          Alert.alert('Cancelled navigation event');
-        }}
-        onError={event => {
-          const message = event?.nativeEvent?.message;
-          if (message) {
-            Alert.alert(message);
-          }
-        }}
-      />
-      <TouchableOpacity
-        onPress={onDeatch}
-        style={{width: '100%', height: 54, backgroundColor: 'gray'}}
+        style={styles.container}
+        origin={[-105.140629, 39.760194]}
+        destination={[-105.156544, 39.761801]}
       />
     </View>
   );

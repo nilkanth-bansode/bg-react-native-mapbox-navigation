@@ -85,7 +85,6 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) :
   @ReactProp(name = "destination")
   fun setDestination(view: MapboxNavigationView, sources: ReadableArray?) {
     if (sources == null) {
-      view.setDestination(null)
       return
     }
     view.setDestination(Point.fromLngLat(sources.getDouble(0), sources.getDouble(1)))
