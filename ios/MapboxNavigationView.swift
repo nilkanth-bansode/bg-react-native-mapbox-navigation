@@ -101,8 +101,14 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
                 let topBanner = CustomTopBarViewController()
                 let bottomBanner = CustomBottomBarViewController()
                 
-                let navigationOptions = NavigationOptions(navigationService: navigationService, topBanner: topBanner, bottomBanner: bottomBanner)
+                let navigationOptions = NavigationOptions(styles: [CustomNightStyle()], navigationService: navigationService, topBanner: topBanner, bottomBanner: bottomBanner)
                 let vc = NavigationViewController(for: indexedRouteResponse, navigationOptions: navigationOptions)
+                
+                vc.floatingButtons?[0].translatesAutoresizingMaskIntoConstraints = false;
+                
+                vc.floatingButtons?[0].topAnchor.constraint(equalTo: vc.view.topAnchor, constant: 180).isActive = true;
+                vc.floatingButtons?[0].rightAnchor.constraint(equalTo: vc.view.rightAnchor, constant: -16).isActive = true;
+                
                 
                 bottomBanner.navigationViewController = vc
                 bottomBanner.view.heightAnchor.constraint(equalToConstant: 80).isActive = true
@@ -117,6 +123,7 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
                 NavigationSettings.shared.voiceMuted = strongSelf.mute;
                 
                 vc.delegate = strongSelf
+                
                 
                 parentVC.addChild(vc)
                 strongSelf.addSubview(vc.view)
@@ -148,5 +155,20 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
     func navigationViewController(_ navigationViewController: NavigationViewController, didArriveAt waypoint: Waypoint) -> Bool {
         onArrive?(["message": ""]);
         return true;
+    }
+}
+
+
+class CustomNightStyle: NightStyle {
+    
+    required init() {
+        super.init()
+    }
+    
+    override func apply() {
+        super.apply()
+        
+        let traitCollection = UIScreen.main.traitCollection
+        FloatingButton.appearance(for: traitCollection).backgroundColor = UIColor(hexString: "#010626")
     }
 }

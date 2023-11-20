@@ -37,8 +37,8 @@ export default function App() {
     <View style={styles.container}>
       <MapboxNavigation
         style={styles.container}
-        origin={[-105.140629, 39.760194]}
-        destination={[-105.156544, 39.761801]}
+        origin={[73.0323619, 26.2864074]}
+        destination={[73.030259, 26.282121]}
       />
     </View>
   );
