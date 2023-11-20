@@ -1,6 +1,6 @@
 {
   "name": "bg-react-native-mapbox-navigation",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "React native mapbox navigation component",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
