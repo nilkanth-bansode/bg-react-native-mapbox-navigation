@@ -1,17 +1,12 @@
 import React, {useEffect} from 'react';
 
-import {
-  StyleSheet,
-  View,
-  PermissionsAndroid,
-  Platform,
-  Alert,
-  TouchableOpacity,
-} from 'react-native';
+import {StyleSheet, View, PermissionsAndroid, Platform} from 'react-native';
 import {MapboxNavigation} from 'bg-react-native-mapbox-navigation';
 
 export default function App() {
-  const destination = [73.031205, 26.270589];
+  const destination = [73.030259, 26.282121];
+  const edge = {top: 10, bottom: 20};
+
   useEffect(() => {
     Platform.OS === 'android' && requestLocationPermission();
   }, []);
@@ -31,14 +26,13 @@ export default function App() {
     }
   };
 
-  const onDeatch = () => {};
-
   return (
     <View style={styles.container}>
       <MapboxNavigation
         style={styles.container}
         origin={[73.0323619, 26.2864074]}
-        destination={[73.030259, 26.282121]}
+        destination={destination}
+        edge={edge}
       />
     </View>
   );

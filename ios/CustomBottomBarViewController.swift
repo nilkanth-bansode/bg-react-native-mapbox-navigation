@@ -46,10 +46,10 @@ class CustomBottomBarViewController: ContainerViewController, CustomBottomBanner
     // MARK: - NavigationServiceDelegate implementation
     
     func navigationService(_ service: NavigationService, didUpdate progress: RouteProgress, with location: CLLocation, rawLocation: CLLocation) {
-        // Update your controls manually
-//        bannerView.progress = Float(progress.fractionTraveled)
-        print("Progress:::")
-        bannerView.eta = "~\(Int(round(progress.durationRemaining / 60))) min"
+        let km = progress.distanceRemaining / 1000
+        let dr = Int(round(progress.durationRemaining / 60));
+        bannerView.eta = "\(dr) min"
+        bannerView.rKm = String(format: "%.2f", km) + " km"
     }
     
     // MARK: - CustomBottomBannerViewDelegate implementation

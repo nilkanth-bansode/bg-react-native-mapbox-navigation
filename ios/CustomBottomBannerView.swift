@@ -8,10 +8,19 @@ protocol CustomBottomBannerViewDelegate: AnyObject {
 class CustomBottomBannerView: UIView {
     let etaLabel: UILabel = {
         let label = UILabel();
-        label.font = UIFont.systemFont(ofSize: 45, weight: .medium);
-        label.textColor = UIColor.blue
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium);
+        label.textColor = UIColor.white
         label.textAlignment = .center
-        label.text = "wait"
+        label.text = "..."
+        return label;
+    }()
+    
+    let rKmLabel: UILabel = {
+        let label = UILabel();
+        label.font = UIFont.systemFont(ofSize: 18, weight: .medium);
+        label.textColor = UIColor.white
+        label.textAlignment = .center
+        label.text = "..."
         return label;
     }()
     
@@ -21,6 +30,15 @@ class CustomBottomBannerView: UIView {
         }
         set {
             etaLabel.text = newValue
+        }
+    }
+    
+    var rKm: String? {
+        get {
+            return rKmLabel.text
+        }
+        set {
+            rKmLabel.text = newValue
         }
     }
     
@@ -38,12 +56,15 @@ class CustomBottomBannerView: UIView {
     
     
     func onViewLoad() -> Void {
-        print("OnBottomLoad:: ")
         addSubview(etaLabel);
+        addSubview(rKmLabel);
         etaLabel.translatesAutoresizingMaskIntoConstraints = false
         etaLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
-        etaLabel.centerXAnchor.constraint(equalTo: self.centerXAnchor).isActive = true
-//        etaLabel.topAnchor.constraint(equalTo: self.topAnchor, constant: -150).isActive = true
+        etaLabel.leftAnchor.constraint(equalTo: self.leftAnchor, constant: 100).isActive = true
+        
+        rKmLabel.translatesAutoresizingMaskIntoConstraints = false
+        rKmLabel.rightAnchor.constraint(equalTo: self.rightAnchor, constant: -100).isActive = true
+        rKmLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true
         
         backgroundColor = UIColor.blue
     }
