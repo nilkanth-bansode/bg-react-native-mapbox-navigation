@@ -1,6 +1,9 @@
 import MapboxCoreNavigation
 import MapboxNavigation
 import MapboxDirections
+import MapboxMaps
+import MapboxCommon
+import MapboxCoreMaps
 
 extension UIView {
     var parentViewController: UIViewController? {
@@ -15,18 +18,25 @@ extension UIView {
     }
 }
 
+@objc(MapboxNavigationView)
 class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
     weak var navViewController: NavigationViewController?
+    let bottomBanner = {
+        return CustomBottomBarViewController()
+    }();
     var embedded: Bool
     var embedding: Bool
     
-    @objc var origin: NSArray = [] {
+    var origin: NSArray = [] {
         didSet { setNeedsLayout() }
     }
     
-    @objc var destination: NSArray = [] {
+    var destination: NSArray = [] {
         didSet { setNeedsLayout() }
     }
+    
+    var edges: NSDictionary?;
+    var bottomConstraint: NSLayoutConstraint!
     
     @objc var shouldSimulateRoute: Bool = false
     @objc var showsEndOfRouteFeedback: Bool = false
@@ -96,26 +106,25 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
                                                                 credentials: NavigationSettings.shared.directions.credentials,
                                                                 simulating: strongSelf.shouldSimulateRoute ? .always : .onPoorGPS)
                 
-            
+                
                 
                 let topBanner = CustomTopBarViewController()
-                let bottomBanner = CustomBottomBarViewController()
+                let bottomEdge = strongSelf.edges?.value(forKey: "bottom")
                 
-                let navigationOptions = NavigationOptions(styles: [CustomNightStyle()], navigationService: navigationService, topBanner: topBanner, bottomBanner: bottomBanner)
+                let navigationOptions = NavigationOptions(styles: [CustomNightStyle()], navigationService: navigationService, topBanner: topBanner, bottomBanner: strongSelf.bottomBanner)
                 let vc = NavigationViewController(for: indexedRouteResponse, navigationOptions: navigationOptions)
                 
                 vc.floatingButtons?[0].translatesAutoresizingMaskIntoConstraints = false;
-                
-                vc.floatingButtons?[0].topAnchor.constraint(equalTo: vc.view.topAnchor, constant: 180).isActive = true;
+                vc.floatingButtons?[0].topAnchor.constraint(equalTo: vc.view.topAnchor, constant: 150).isActive = true;
                 vc.floatingButtons?[0].rightAnchor.constraint(equalTo: vc.view.rightAnchor, constant: -16).isActive = true;
                 
+                strongSelf.bottomBanner.navigationViewController = vc
+                strongSelf.bottomBanner.view.heightAnchor.constraint(equalToConstant: 80).isActive = true
+                strongSelf.bottomConstraint = strongSelf.bottomBanner.view.bottomAnchor.constraint(equalTo: vc.view.bottomAnchor, constant: -(bottomEdge as! CGFloat))
                 
-                bottomBanner.navigationViewController = vc
-                bottomBanner.view.heightAnchor.constraint(equalToConstant: 80).isActive = true
-                bottomBanner.view.bottomAnchor.constraint(equalTo: vc.view.bottomAnchor).isActive = true;
+                strongSelf.bottomConstraint.isActive = true;
                 
                 topBanner.view.topAnchor.constraint(equalTo: vc.view.topAnchor).isActive = true
-                
                 
                 vc.showsEndOfRouteFeedback = strongSelf.showsEndOfRouteFeedback
                 StatusView.appearance().isHidden = strongSelf.hideStatusView
@@ -123,7 +132,6 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
                 NavigationSettings.shared.voiceMuted = strongSelf.mute;
                 
                 vc.delegate = strongSelf
-                
                 
                 parentVC.addChild(vc)
                 strongSelf.addSubview(vc.view)
@@ -143,6 +151,7 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
                                 "durationRemaining": progress.durationRemaining,
                                 "fractionTraveled": progress.fractionTraveled,
                                 "distanceRemaining": progress.distanceRemaining])
+        
     }
     
     func navigationViewControllerDidDismiss(_ navigationViewController: NavigationViewController, byCanceling canceled: Bool) {
@@ -156,6 +165,55 @@ class MapboxNavigationView: UIView, NavigationViewControllerDelegate {
         onArrive?(["message": ""]);
         return true;
     }
+    
+    // MARK: - React Native properties
+    @objc func setReactEdge(_ value: NSDictionary?) {
+        if(value != nil) {
+            self.edges = value
+            if(navViewController != nil && (value?.value(forKey: "bottom")) != nil) {
+                self.bottomConstraint.constant = -(value?["bottom"] as! CGFloat);
+            }
+        }
+    }
+    
+    @objc func setReactDestination(_ value: NSArray?) {
+        if(value != nil) {
+            self.destination = value ?? self.destination
+            if(navViewController != nil) {
+                let originWaypoint = Waypoint(coordinate: CLLocationCoordinate2D(latitude: origin[1] as! CLLocationDegrees, longitude: origin[0] as! CLLocationDegrees))
+                let destinationWaypoint = Waypoint(coordinate: CLLocationCoordinate2D(latitude: destination[1] as! CLLocationDegrees, longitude: destination[0] as! CLLocationDegrees))
+                
+                let options = NavigationRouteOptions(waypoints: [originWaypoint, destinationWaypoint], profileIdentifier: .automobileAvoidingTraffic)
+                
+                let edges = UIEdgeInsets(top: 10, left: 10, bottom: 400, right: 20)
+                
+                let cameraOption = CameraOptions(center: nil, padding: edges);
+                
+                Directions.shared.calculate(options) { [weak self] (session, result) in
+                    switch result {
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    case .success(let response):
+                        guard let strongSelf = self else {
+                            return
+                        }
+                        
+                        let indexedRouteResponse = IndexedRouteResponse(routeResponse: response, routeIndex: 0)
+                        strongSelf.navViewController?.navigationService.router.updateRoute(with: indexedRouteResponse, routeOptions: options, completion: nil)
+                        
+                        strongSelf.navViewController?.navigationMapView?.mapView.mapboxMap.setCamera(to: cameraOption)
+                    }
+                }
+            }
+        }
+    }
+    
+    @objc func setReactOrigin (_ value: NSArray?) {
+        if(value != nil) {
+            self.origin = value ?? self.origin
+        }
+    }
+    
 }
 
 
@@ -172,3 +230,7 @@ class CustomNightStyle: NightStyle {
         FloatingButton.appearance(for: traitCollection).backgroundColor = UIColor(hexString: "#010626")
     }
 }
+
+
+
+

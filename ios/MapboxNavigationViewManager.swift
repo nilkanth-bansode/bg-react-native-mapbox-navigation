@@ -7,7 +7,6 @@ import UIKit
 
 @objc(MapboxNavigationViewManager)
 class MapboxNavigationViewManager: RCTViewManager {
-    
     override func view() -> (MapboxNavigationView) {
         return MapboxNavigationView();
     }
@@ -43,5 +42,11 @@ extension UIColor {
         getRed(&r, green: &g, blue: &b, alpha: &a)
         let rgb:Int = (Int)(r*255)<<16 | (Int)(g*255)<<8 | (Int)(b*255)<<0
         return String(format:"#%06x", rgb)
+    }
+}
+
+extension Date {
+    func adding(minutes: Int) -> Date {
+        return Calendar.current.date(byAdding: .minute, value: minutes, to: self)!
     }
 }
