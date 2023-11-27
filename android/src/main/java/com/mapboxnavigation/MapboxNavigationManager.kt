@@ -51,7 +51,7 @@ class MapboxNavigationManager(var mCallerContext: ReactApplicationContext) :
   }
 
   override fun getName(): String {
-    return "MapboxNavigation"
+    return "MapboxNavigationView"
   }
 
   public override fun createViewInstance(@Nonnull reactContext: ThemedReactContext): MapboxNavigationView {
