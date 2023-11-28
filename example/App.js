@@ -6,6 +6,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import NavigationMap from './navigation-map';
 import EmptyScreen from './empty-screen';
+import NextScreen from './next-screen';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
         <Stack.Navigator>
           <Stack.Screen name="NavigationMap" component={NavigationMap} />
           <Stack.Screen name="EmptyScreen" component={EmptyScreen} />
+          <Stack.Screen name="NextScreen" component={NextScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </View>
